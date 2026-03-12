@@ -16,7 +16,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sSf https://example.com/install.sh | bash
+      - name: Install tool
+        run: |
+          # comment
+          curl -sSf https://example.com/install.sh | bash
+          echo safe
       - run: echo safe
 """.strip(),
         encoding="utf-8",
@@ -29,3 +33,5 @@ jobs:
 
     assert len(findings) == 1
     assert findings[0].rule_id == "PG004"
+    assert findings[0].step_name == "Install tool"
+    assert findings[0].line == 1

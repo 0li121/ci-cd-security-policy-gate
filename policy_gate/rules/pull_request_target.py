@@ -19,7 +19,7 @@ class PullRequestTargetRule(BaseRule):
     ) -> list:
         findings = []
         for workflow in workflows:
-            if not _has_pull_request_target(workflow.triggers):
+            if not workflow.trigger.has_event("pull_request_target"):
                 continue
             severity_message = "Dangerous use of pull_request_target detected."
             if _workflow_executes_code(workflow):
@@ -34,16 +34,6 @@ class PullRequestTargetRule(BaseRule):
                 )
             )
         return findings
-
-
-def _has_pull_request_target(triggers: object) -> bool:
-    if triggers == "pull_request_target":
-        return True
-    if isinstance(triggers, list):
-        return "pull_request_target" in triggers
-    if isinstance(triggers, dict):
-        return "pull_request_target" in triggers
-    return False
 
 
 def _workflow_executes_code(workflow: WorkflowDocument) -> bool:

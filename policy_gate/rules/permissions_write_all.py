@@ -19,7 +19,7 @@ class PermissionsWriteAllRule(BaseRule):
     ) -> list:
         findings = []
         for workflow in workflows:
-            if workflow.permissions == "write-all":
+            if _is_write_all(workflow.permissions):
                 findings.append(
                     build_finding(
                         self.metadata,
@@ -28,13 +28,20 @@ class PermissionsWriteAllRule(BaseRule):
                     )
                 )
             for job in workflow.jobs:
-                if job.permissions == "write-all":
+                if _is_write_all(job.permissions):
                     findings.append(
                         build_finding(
                             self.metadata,
                             file_path=workflow.relative_path,
                             message=f"Job '{job.job_id}' requests write-all permissions.",
+                            job_id=job.job_id,
                             details={"job_id": job.job_id},
                         )
                     )
         return findings
+
+
+def _is_write_all(permissions: str | dict | None) -> bool:
+    if not isinstance(permissions, str):
+        return False
+    return permissions.strip().lower() == "write-all"

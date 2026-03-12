@@ -46,6 +46,8 @@ class Finding:
     message: str
     remediation: str
     line: int | None = None
+    job_id: str | None = None
+    step_name: str | None = None
     details: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -59,13 +61,27 @@ class Finding:
         }
         if self.line is not None:
             payload["line"] = self.line
+        if self.job_id is not None:
+            payload["job_id"] = self.job_id
+        if self.step_name is not None:
+            payload["step_name"] = self.step_name
         if self.details:
             payload["details"] = self.details
         return payload
 
 
 @dataclass(frozen=True)
+class WorkflowTrigger:
+    events: tuple[str, ...]
+    raw: Any
+
+    def has_event(self, event_name: str) -> bool:
+        return event_name in self.events
+
+
+@dataclass(frozen=True)
 class WorkflowStep:
+    step_index: int
     name: str | None
     uses: str | None
     run: str | None
@@ -74,6 +90,7 @@ class WorkflowStep:
 @dataclass(frozen=True)
 class WorkflowJob:
     job_id: str
+    name: str | None
     permissions: str | dict[str, Any] | None
     steps: list[WorkflowStep]
 
@@ -82,7 +99,7 @@ class WorkflowJob:
 class WorkflowDocument:
     file_path: Path
     name: str
-    triggers: Any
+    trigger: WorkflowTrigger
     permissions: str | dict[str, Any] | None
     jobs: list[WorkflowJob]
     raw: dict[str, Any]

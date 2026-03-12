@@ -27,7 +27,11 @@ class UnpinnedActionsRule(BaseRule):
         for workflow in workflows:
             for job in workflow.jobs:
                 for step in job.steps:
-                    if not step.uses or "/" not in step.uses or "@" not in step.uses:
+                    if not step.uses:
+                        continue
+                    if _is_local_action(step.uses) or _is_container_action(step.uses):
+                        continue
+                    if "/" not in step.uses or "@" not in step.uses:
                         continue
                     action_ref, ref = step.uses.split("@", 1)
                     owner = action_ref.split("/", 1)[0].lower()
@@ -40,7 +44,17 @@ class UnpinnedActionsRule(BaseRule):
                             self.metadata,
                             file_path=workflow.relative_path,
                             message=f"Third-party action '{step.uses}' is not pinned to a commit SHA.",
+                            job_id=job.job_id,
+                            step_name=step.name,
                             details={"job_id": job.job_id, "action": step.uses},
                         )
                     )
         return findings
+
+
+def _is_local_action(action_ref: str) -> bool:
+    return action_ref.startswith("./")
+
+
+def _is_container_action(action_ref: str) -> bool:
+    return action_ref.startswith("docker://")

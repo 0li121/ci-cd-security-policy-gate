@@ -16,8 +16,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: ./local-action
       - uses: actions/checkout@v4
       - uses: vendor/suspicious-action@v1
+      - uses: docker://alpine:3.20
       - uses: vendor/pinned-action@0123456789abcdef0123456789abcdef01234567
 """.strip(),
         encoding="utf-8",
@@ -30,3 +32,4 @@ jobs:
 
     assert len(findings) == 1
     assert findings[0].rule_id == "PG002"
+    assert findings[0].job_id == "build"

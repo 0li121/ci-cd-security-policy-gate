@@ -30,3 +30,4 @@ jobs:
 
     assert len(findings) == 2
     assert {finding.rule_id for finding in findings} == {"PG001"}
+    assert findings[1].job_id == "deploy"

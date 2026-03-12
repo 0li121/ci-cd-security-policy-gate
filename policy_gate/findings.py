@@ -10,6 +10,8 @@ def build_finding(
     message: str,
     remediation: str | None = None,
     line: int | None = None,
+    job_id: str | None = None,
+    step_name: str | None = None,
     details: dict | None = None,
 ) -> Finding:
     return Finding(
@@ -20,5 +22,7 @@ def build_finding(
         message=message,
         remediation=remediation or metadata.remediation,
         line=line,
+        job_id=job_id,
+        step_name=step_name,
         details=details or {},
     )
