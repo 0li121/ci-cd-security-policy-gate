@@ -3,9 +3,9 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+*.pyc
+*.pyo
+*.pyd
 dist/
 build/
 *.egg-info/
-.coverage
-htmlcov/
-.DS_Store

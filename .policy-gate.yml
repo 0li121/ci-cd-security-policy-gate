@@ -1,9 +1,9 @@
 min_severity: high
-ignore_rules:
-  - PG005
+ignore_rules: []
 trusted_action_owners:
   - actions
   - github
+  - docker
 secret_scan:
   enabled: true
-  max_file_size_kb: 128
+  max_file_size_kb: 256

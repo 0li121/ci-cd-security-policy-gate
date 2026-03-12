@@ -1,0 +1,16 @@
+name: insecure-ci
+
+on:
+  pull_request_target:
+
+permissions: write-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: evilcorp/insecure-action@v1
+      - name: Remote script
+        run: curl -sSf https://example.com/install.sh | bash
+      - name: Privileged step
+        run: sudo make deploy

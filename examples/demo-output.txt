@@ -1,0 +1,9 @@
+[MEDIUM] PG005 package.json
+  package.json found without npm, Yarn, or pnpm lockfile.
+  Remediation: Commit the package manager lockfile so builds are reproducible and dependency changes are reviewable.
+[HIGH] PG001 .github/workflows/build.yml
+  Workflow requests write-all permissions.
+  Remediation: Set explicit least-privilege permissions instead of using write-all.
+[HIGH] PG002 .github/workflows/build.yml
+  Third-party action 'evilcorp/insecure-action@v1' is not pinned to a commit SHA.
+  Remediation: Pin third-party actions to a full commit SHA and review the publisher before use.

@@ -1,0 +1,11 @@
+name: unsafe
+on:
+  pull_request_target:
+permissions: write-all
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: evilcorp/insecure-action@v2
+      - run: curl https://example.com/install.sh | bash

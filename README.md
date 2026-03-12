@@ -1,30 +1,94 @@
 # CI/CD Security Policy Gate
 
-CI/CD Security Policy Gate is a Python CLI tool that scans GitHub repositories for insecure CI/CD configurations, especially GitHub Actions workflows, and fails the pipeline when dangerous settings are detected.
+`policy-gate` is a Python CLI tool that scans GitHub repositories for insecure CI/CD and software delivery patterns, with an initial focus on GitHub Actions workflows. It is designed as a practical security engineering portfolio project: small enough for one developer to build, but structured like a real internal security tool.
 
-## Why this project exists
+## What It Detects
 
-Modern software delivery pipelines are part of the attack surface. Misconfigured GitHub Actions workflows, overly broad permissions, unpinned third-party actions, and unsafe execution patterns can all create security risk.
+- Overly broad workflow or job permissions such as `permissions: write-all`
+- Unpinned third-party GitHub Actions
+- Dangerous `pull_request_target` usage
+- Unsafe shell execution patterns such as `curl | bash`, `wget | sh`, and `sudo`
+- Missing dependency lockfiles for common ecosystems
+- Lightweight committed secret exposure patterns
+- Risky workflow execution against untrusted pull requests
 
-This tool is designed to demonstrate practical security engineering through policy-as-code controls for CI/CD.
+## Why This Project Exists
 
-## MVP goals
+CI/CD systems are part of the application attack surface. A workflow that runs with excessive permissions, executes untrusted code, or pulls mutable third-party actions can turn a simple pull request into a supply chain incident. This project demonstrates how to codify those risks as maintainable, testable security checks.
 
-- Scan GitHub Actions workflows
-- Detect insecure CI/CD patterns
-- Report findings with remediation guidance
-- Fail CI when blocking issues are present
-- Integrate cleanly into GitHub Actions
+## Features
 
-## Planned checks
+- Python 3.11+ CLI built with `typer`
+- Safe GitHub Actions parsing with `PyYAML`
+- Rule-based architecture with normalized findings
+- Text and JSON output
+- Configurable thresholds via `.policy-gate.yml`
+- GitHub Actions integration for self-scanning
+- Pytest coverage with realistic repository fixtures
 
-- overly broad permissions
-- unpinned third-party actions
-- dangerous pull_request_target usage
-- unsafe shell commands
-- missing lockfiles
-- lightweight committed secret detection
+## Installation
 
-## Status
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
 
-Initial scaffold in progress.
+## Usage
+
+```bash
+policy-gate scan .
+policy-gate scan . --config .policy-gate.yml
+policy-gate scan . --min-severity high
+policy-gate scan . --format json
+```
+
+Example output:
+
+```text
+[HIGH] PG003 .github/workflows/deploy.yml
+  Dangerous use of pull_request_target detected.
+  Remediation: Avoid pull_request_target for workflows that execute code from untrusted pull requests.
+```
+
+## Configuration
+
+Create a `.policy-gate.yml` file in the repository root:
+
+```yaml
+min_severity: high
+ignore_rules:
+  - PG006
+trusted_action_owners:
+  - actions
+  - github
+secret_scan:
+  enabled: true
+  max_file_size_kb: 256
+```
+
+## Project Structure
+
+```text
+policy_gate/
+  cli.py
+  config.py
+  formatter.py
+  models.py
+  repo_discovery.py
+  scanner.py
+  parsers/
+  rules/
+tests/
+examples/
+docs/
+```
+
+## Architecture Notes
+
+- Parsers normalize repository data into stable models.
+- Rules are intentionally independent and simple to explain in an interview.
+- The scanner orchestrates discovery, parsing, evaluation, and pass/fail decisions.
+- Secret scanning is intentionally lightweight to keep the project centered on CI/CD policy enforcement.
+
+See [docs/architecture.md](/Users/olibonnick/Projects/ci-cd-security-policy-gate/docs/architecture.md) and [docs/threat-model.md](/Users/olibonnick/Projects/ci-cd-security-policy-gate/docs/threat-model.md) for more detail.

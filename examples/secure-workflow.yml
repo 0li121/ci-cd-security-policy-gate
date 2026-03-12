@@ -1,0 +1,21 @@
+name: secure-ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: pip install -r requirements-dev.txt
+      - name: Test
+        run: pytest
